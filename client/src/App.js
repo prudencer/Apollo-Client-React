@@ -1,96 +1,62 @@
-import logo from './logo.svg';
-import './App.css';
-import NavBar from "./components/navBar"
-import Joke from './components/joke';
+import logo, { ReactComponent } from './logo.svg';
+//import './App.css';
+import NavBar from "./Components/NavBar"
+import Joke from './Components/Joke';
 import { Component, useState } from 'react';
+import { gql, useQuery } from '@apollo/client';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      categories: [],
-      loading: false,
-      option: "0",
-      selected: null
+const GET_JOKE = gql`
+  query GeJoke($category: String){
+    random(category: $category){
+      icon_url
+      value
     }
   }
+`;
 
-  componentDidMount() {
-    this.bindCategories()
+const GET_CATEGORIES = gql`
+{
+  categories{
+    name
   }
+}
+`;
 
-  bindCategories = () => {
-    // Call backend method
-    const categories = [
-      "monday",
-      "tuesday"
-    ]
+const Categories = () => {
+  const {
+    loading,
+    error,
+    data: { categories },
+  } = useQuery(GET_CATEGORIES);
 
-    // This stays the same
-    this.setState({categories})
-  };
+  return (
+    <div>
+      <select class="custom-select" id="inputGroupSelect04">
+        {categories.map((category) => (
+            <option>{category}</option>
+        ))
+        }
+      </select>
+    </div>
+  );
 
-  bindJoke = (category) => {
-    // Call backend method
-    const selected = {
-      "icon_url": "https://assets.chucknorris.host/img/avatar/chuck-norris.png",
-      "value": "This is a joke"
-    }
-    // This stays the same
-    this.setState({selected})
-    this.setState({loading: false})
-  };
-
-  onGetJokeClick= () => {
-    const {option} = this.state;
-
-    this.setState({loading: true})
-    this.setState({selected: null})
-    if(option === "0") {
-      this.setState({selected: null})
-      this.setState({loading: false})
-    } else {
-      this.bindJoke(option)
-    }
-  };
-
-  onSelectionChange = (event) => {
-    this.setState({option: event.target.value})
-  };
-
-  render() {
-    const {categories, selected, loading} = this.state;
-    return (
-      <div className="App">
-          <div class="container" style={{width: 600, margin: "auto"}}>
-
-            <NavBar/>
-
-            <div style={{padding: 20}}>
-              <div class="input-group">
-                <select onChange={this.onSelectionChange} class="custom-select" id="inputGroupSelect04">
-                  <option value={0} selected>Choose category...</option>
-                  {categories.map((item, index) => (
-                    <option>{item}</option>
-                  ))
-                  }
-                </select>
-                <div class="input-group-append">
-                  <button class="btn btn-primary" type="button" onClick={this.onGetJokeClick} disabled={loading}>
-                    {loading? "Processing" : "Get Joke"}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-          { 
-            selected &&
-            <Joke joke={selected}/>
-          }
-        </div>
-      </div>
-    );
- }
 }
 
+
+class App extends ReactComponent{
+  constructor(props){
+    super(props);
+    this.state = {categorySelected: 'animal'};
+  }
+
+  render(){
+    return(
+      <div>
+        <NavBar />
+        <h1>hahhdhfhdhf</h1>
+        <Categories />
+      </div>
+    );
+  }
+}
 export default App;
